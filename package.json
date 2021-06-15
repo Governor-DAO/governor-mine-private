@@ -10,7 +10,6 @@
     "bignumber.js": "^9.0.1",
     "ethers": "^5.0.24",
     "governor-common": "github:Governor-DAO/governor-common-private",
-    "node-sass": "^4.14.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-feather": "^2.0.8",
@@ -26,7 +25,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "postinstall": "rm -rf src/governor-common && cp -r node_modules/governor-common/src src/governor-common"
+    "postinstall": "npx rimraf src/governor-common && npx copyfiles \"node_modules/governor-common/src/**/*.*\" src/governor-common -u 3 -V"
   },
   "eslintConfig": {
     "extends": [
@@ -45,5 +44,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "copyfiles": "^2.4.1",
+    "rimraf": "^3.0.2",
+    "sass": "^1.35.0"
   }
 }
