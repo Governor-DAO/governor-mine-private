@@ -10,7 +10,7 @@ import {
 } from "../../utilities/constants/constants";
 
 export default class Token {
-  constructor(address, lpAddress, name, text, unit, logo, pid) {
+  constructor(address, lpAddress, name, text, unit, logo, pid, displayWarning) {
     this.address = address;
     this.lpAddress = lpAddress;
     this.farmAddress = farmAddress;
@@ -19,6 +19,7 @@ export default class Token {
     this.unit = unit;
     this.logo = logo;
     this.pid = pid;
+    this.displayWarning = displayWarning;
     // Values below will be fetched
     this.contract = null;
     this.lpContract = null;

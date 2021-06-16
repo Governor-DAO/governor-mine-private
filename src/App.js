@@ -127,7 +127,8 @@ export default class App extends Component {
           pool.text,
           pool.unit,
           pool.logo,
-          pool.pid
+          pool.pid,
+          pool.displayWarning
         )
     );
   };
