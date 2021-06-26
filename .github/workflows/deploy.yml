@@ -1,0 +1,113 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+      - production
+
+jobs:
+
+  build:
+    if: (endsWith(github.ref, '/production') || endsWith(github.ref, '/develop'))
+
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    outputs:
+      outputbranch: ${{ steps.step-output.outputs.path }}
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Check Branch
+        run: echo "Deploying to server on branch $GITHUB_REF"
+
+      - name: Set env to production
+        if: endsWith(github.ref, '/production')
+        run: |
+          echo "deploy_path=production" >> $GITHUB_ENV
+      
+      - name: Set env to develp
+        if: endsWith(github.ref, '/develop')
+        run: |
+          echo "deploy_path=develop" >> $GITHUB_ENV
+
+      - name: Store env
+        id: step-output
+        run: |
+          echo "::set-output name=path::${{env.deploy_path}}"
+          echo "${{ github.event.repository.name }}"
+
+
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: Configure git for HTTPS token auth
+        run: git config --global url."https://${{ secrets.CROSS_REPO_TOKEN }}@github.com/".insteadOf ssh://git@github.com/
+
+      - name: Install Packages
+        run: npm install
+        
+      - name: Build package
+        run: npm run build
+
+      - name: Tar files
+        run: tar -cvf ${{ github.event.repository.name }}.tar build
+
+      - name: Store package
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ github.event.repository.name }}
+          path: ${{ github.event.repository.name }}.tar
+    
+      # save for debug
+      # - name: Display structure
+      #  run: ls -R
+      
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        host: [ec2-3-16-183-44.us-east-2.compute.amazonaws.com, ec2-3-133-59-102.us-east-2.compute.amazonaws.com]
+
+    steps:
+      - name: Get Package
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ github.event.repository.name }}
+          # path: governor-authentication.tar
+
+      - name: Transfer package
+        uses: burnett01/rsync-deployments@4.1
+        with:
+          switches: -avzr
+          path: ./
+          remote_path: /home/ec2-user/deploy/
+          remote_host: ${{ matrix.host }}
+          remote_port: 22
+          remote_user: ec2-user
+          remote_key: ${{ secrets.AWS_DEPLOY_KEY }}
+
+      - name: Execute remote ssh commands on host
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ matrix.host }}
+          username: ec2-user
+          key: ${{ secrets.AWS_DEPLOY_KEY }}
+          port: 22
+          script: |
+            echo ${{ needs.build.outputs.outputbranch }}
+            echo Branch ${{ github.ref }}
+            cd deploy
+            [ -d ${{ github.event.repository.name }} ] || mkdir ${{ github.event.repository.name }}
+            cd ${{ github.event.repository.name }}
+            export DEPLOYOLD=$(readlink -f ${{ needs.build.outputs.outputbranch }})
+            export DEPLOYPATH=build-${{ needs.build.outputs.outputbranch }}-$(date +%Y%m%d%H%M%S)
+            echo deploying to deploy/${{ github.event.repository.name }}/$DEPLOYPATH
+            mkdir $DEPLOYPATH
+            tar -xvf ../${{ github.event.repository.name }}.tar -C $DEPLOYPATH
+            ln -sfn ./$DEPLOYPATH/build ${{ needs.build.outputs.outputbranch }}
