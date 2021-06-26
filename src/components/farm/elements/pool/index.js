@@ -289,7 +289,7 @@ export default class Pool extends Component {
                 subtitle={"Withdraw and claim rewards"}
               />
             </div>
-            {token.displayWarning && (<p class="warning-text">Mines will cease to generate rewards June 25th at approximately 3pm CST (based on block number)</p>)}
+            {token.displayWarning && (<p class="warning-text">Mines are closed and no longer generating rewards, withdraw your tokens when convenient, no fees to withdraw, claim included in withdraw</p>)}
             <div className="claims">
               <div className="title">Available rewards:</div>
               <div className="value">{`${
