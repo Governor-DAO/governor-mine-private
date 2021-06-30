@@ -17,7 +17,7 @@ export const prodpools = [
     address: "0x4D184bf6F805Ee839517164D301f0C4e5d25c374",
     lpAddress: "0x4D184bf6F805Ee839517164D301f0C4e5d25c374",
     pid: "0",
-    displayWarning: false,
+    displayWarning: true,
   },
   {
     logo: WBTC,
