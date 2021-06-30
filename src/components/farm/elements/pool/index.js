@@ -258,7 +258,7 @@ export default class Pool extends Component {
               />
             </div>
             <div className="fields">
-              <InputField
+            {/*<InputField
                 title={"Your wallet"}
                 current={convertToETH(token.depositable, this.props.token.unit)}
                 unit={token.unit}
@@ -274,7 +274,10 @@ export default class Pool extends Component {
                 subtitle={"Approved: " + currApproved + ", Deposit Fee: 2%"}
                 valueApproved={token.approved}
                 tokenDecimals={decimals}
-              />
+            />*/}
+              <form className="input-field">
+                
+              </form>
               <InputField
                 title={"Staked in contract"}
                 current={convertToETH(token.deposited, this.props.token.unit)}

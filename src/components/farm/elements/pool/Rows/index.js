@@ -22,7 +22,8 @@ const Row = (props) => {
       <RowItem
         c={"row-apy"}
         t={"APY"}
-        s={`${roundValue(token.apy)}%`}
+        //s={`${roundValue(token.apy)}%`}
+        s={`-`}
         isConnected={isConnected}
       />
       <RowItem
