@@ -202,8 +202,10 @@ export default class Pool extends Component {
 
   render() {
     const { token, walletconnect } = this.props;
-    const { isExpanded, toDeposit, toWithdraw, isApproved } = this.state;
+    //const { isExpanded, toDeposit, toWithdraw, isApproved } = this.state;
+    const { isExpanded, toWithdraw } = this.state;
 
+    /*
     let approved = 0;
     let decimals = 18;
 
@@ -218,6 +220,7 @@ export default class Pool extends Component {
     }
 
     const currApproved = approved !== undefined ? approved : "-";
+    */
 
     return (
       <div
